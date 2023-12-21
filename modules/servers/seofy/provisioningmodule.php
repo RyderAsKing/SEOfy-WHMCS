@@ -30,8 +30,8 @@
  * @license https://www.whmcs.com/license/ WHMCS Eula
  */
 
-if (!defined("WHMCS")) {
-    die("This file cannot be accessed directly");
+if (!defined('WHMCS')) {
+    die('This file cannot be accessed directly');
 }
 
 // Require any libraries needed for the module to function.
@@ -51,7 +51,7 @@ if (!defined("WHMCS")) {
  */
 function provisioningmodule_MetaData()
 {
-    return array(
+    return [
         'DisplayName' => 'Demo Provisioning Module',
         'APIVersion' => '1.1', // Use API Version 1.1
         'RequiresServer' => true, // Set true if module requires a server to work
@@ -59,7 +59,7 @@ function provisioningmodule_MetaData()
         'DefaultSSLPort' => '1112', // Default SSL Connection Port
         'ServiceSingleSignOnLabel' => 'Login to Panel as User',
         'AdminSingleSignOnLabel' => 'Login to Panel as Admin',
-    );
+    ];
 }
 
 /**
@@ -87,50 +87,50 @@ function provisioningmodule_MetaData()
  */
 function provisioningmodule_ConfigOptions()
 {
-    return array(
+    return [
         // a text field type allows for single line text input
-        'Text Field' => array(
+        'Text Field' => [
             'Type' => 'text',
             'Size' => '25',
             'Default' => '1024',
             'Description' => 'Enter in megabytes',
-        ),
+        ],
         // a password field type allows for masked text input
-        'Password Field' => array(
+        'Password Field' => [
             'Type' => 'password',
             'Size' => '25',
             'Default' => '',
             'Description' => 'Enter secret value here',
-        ),
+        ],
         // the yesno field type displays a single checkbox option
-        'Checkbox Field' => array(
+        'Checkbox Field' => [
             'Type' => 'yesno',
             'Description' => 'Tick to enable',
-        ),
+        ],
         // the dropdown field type renders a select menu of options
-        'Dropdown Field' => array(
+        'Dropdown Field' => [
             'Type' => 'dropdown',
-            'Options' => array(
+            'Options' => [
                 'option1' => 'Display Value 1',
                 'option2' => 'Second Option',
                 'option3' => 'Another Option',
-            ),
+            ],
             'Description' => 'Choose one',
-        ),
+        ],
         // the radio field type displays a series of radio button options
-        'Radio Field' => array(
+        'Radio Field' => [
             'Type' => 'radio',
             'Options' => 'First Option,Second Option,Third Option',
             'Description' => 'Choose your option!',
-        ),
+        ],
         // the textarea field type allows for multi-line text input
-        'Textarea Field' => array(
+        'Textarea Field' => [
             'Type' => 'textarea',
             'Rows' => '3',
             'Cols' => '60',
             'Description' => 'Freeform multi-line text input field',
-        ),
-    );
+        ],
+    ];
 }
 
 /**
@@ -382,7 +382,7 @@ function provisioningmodule_ChangePackage(array $params)
  * Renew an instance of a product/service.
  *
  * Attempt to renew an existing instance of a given product/service. This is
- * called any time a product/service invoice has been paid. 
+ * called any time a product/service invoice has been paid.
  *
  * @param array $params common module parameters
  *
@@ -463,10 +463,10 @@ function provisioningmodule_TestConnection(array $params)
         $errorMsg = $e->getMessage();
     }
 
-    return array(
+    return [
         'success' => $success,
         'error' => $errorMsg,
-    );
+    ];
 }
 
 /**
@@ -481,10 +481,10 @@ function provisioningmodule_TestConnection(array $params)
  */
 function provisioningmodule_AdminCustomButtonArray()
 {
-    return array(
-        "Button 1 Display Value" => "buttonOneFunction",
-        "Button 2 Display Value" => "buttonTwoFunction",
-    );
+    return [
+        'Button 1 Display Value' => 'buttonOneFunction',
+        'Button 2 Display Value' => 'buttonTwoFunction',
+    ];
 }
 
 /**
@@ -500,10 +500,10 @@ function provisioningmodule_AdminCustomButtonArray()
  */
 function provisioningmodule_ClientAreaCustomButtonArray()
 {
-    return array(
-        "Action 1 Display Value" => "actionOneFunction",
-        "Action 2 Display Value" => "actionTwoFunction",
-    );
+    return [
+        'Action 1 Display Value' => 'actionOneFunction',
+        'Action 2 Display Value' => 'actionTwoFunction',
+    ];
 }
 
 /**
@@ -599,18 +599,26 @@ function provisioningmodule_AdminServicesTabFields(array $params)
     try {
         // Call the service's function, using the values provided by WHMCS in
         // `$params`.
-        $response = array();
+        $response = [];
 
         // Return an array based on the function's response.
-        return array(
+        return [
             'Number of Apples' => (int) $response['numApples'],
             'Number of Oranges' => (int) $response['numOranges'],
-            'Last Access Date' => date("Y-m-d H:i:s", $response['lastLoginTimestamp']),
-            'Something Editable' => '<input type="hidden" name="provisioningmodule_original_uniquefieldname" '
-                . 'value="' . htmlspecialchars($response['textvalue']) . '" />'
-                . '<input type="text" name="provisioningmodule_uniquefieldname"'
-                . 'value="' . htmlspecialchars($response['textvalue']) . '" />',
-        );
+            'Last Access Date' => date(
+                'Y-m-d H:i:s',
+                $response['lastLoginTimestamp']
+            ),
+            'Something Editable' =>
+                '<input type="hidden" name="provisioningmodule_original_uniquefieldname" ' .
+                'value="' .
+                htmlspecialchars($response['textvalue']) .
+                '" />' .
+                '<input type="text" name="provisioningmodule_uniquefieldname"' .
+                'value="' .
+                htmlspecialchars($response['textvalue']) .
+                '" />',
+        ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -624,7 +632,7 @@ function provisioningmodule_AdminServicesTabFields(array $params)
         // In an error condition, simply return no additional fields to display.
     }
 
-    return array();
+    return [];
 }
 
 /**
@@ -644,7 +652,9 @@ function provisioningmodule_AdminServicesTabFields(array $params)
 function provisioningmodule_AdminServicesTabFieldsSave(array $params)
 {
     // Fetch form submission variables.
-    $originalFieldValue = isset($_REQUEST['provisioningmodule_original_uniquefieldname'])
+    $originalFieldValue = isset(
+        $_REQUEST['provisioningmodule_original_uniquefieldname']
+    )
         ? $_REQUEST['provisioningmodule_original_uniquefieldname']
         : '';
 
@@ -690,12 +700,12 @@ function provisioningmodule_ServiceSingleSignOn(array $params)
     try {
         // Call the service's single sign-on token retrieval function, using the
         // values provided by WHMCS in `$params`.
-        $response = array();
+        $response = [];
 
-        return array(
+        return [
             'success' => true,
             'redirectTo' => $response['redirectUrl'],
-        );
+        ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -706,10 +716,10 @@ function provisioningmodule_ServiceSingleSignOn(array $params)
             $e->getTraceAsString()
         );
 
-        return array(
+        return [
             'success' => false,
             'errorMsg' => $e->getMessage(),
-        );
+        ];
     }
 }
 
@@ -735,12 +745,12 @@ function provisioningmodule_AdminSingleSignOn(array $params)
     try {
         // Call the service's single sign-on admin token retrieval function,
         // using the values provided by WHMCS in `$params`.
-        $response = array();
+        $response = [];
 
-        return array(
+        return [
             'success' => true,
             'redirectTo' => $response['redirectUrl'],
-        );
+        ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -751,10 +761,10 @@ function provisioningmodule_AdminSingleSignOn(array $params)
             $e->getTraceAsString()
         );
 
-        return array(
+        return [
             'success' => false,
             'errorMsg' => $e->getMessage(),
-        );
+        ];
     }
 }
 
@@ -792,7 +802,9 @@ function provisioningmodule_ClientArea(array $params)
 {
     // Determine the requested action and set service call parameters based on
     // the action.
-    $requestedAction = isset($_REQUEST['customAction']) ? $_REQUEST['customAction'] : '';
+    $requestedAction = isset($_REQUEST['customAction'])
+        ? $_REQUEST['customAction']
+        : '';
 
     if ($requestedAction == 'manage') {
         $serviceAction = 'get_usage';
@@ -805,18 +817,18 @@ function provisioningmodule_ClientArea(array $params)
     try {
         // Call the service's function based on the request action, using the
         // values provided by WHMCS in `$params`.
-        $response = array();
+        $response = [];
 
         $extraVariable1 = 'abc';
         $extraVariable2 = '123';
 
-        return array(
+        return [
             'tabOverviewReplacementTemplate' => $templateFile,
-            'templateVariables' => array(
+            'templateVariables' => [
                 'extraVariable1' => $extraVariable1,
                 'extraVariable2' => $extraVariable2,
-            ),
-        );
+            ],
+        ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -828,11 +840,11 @@ function provisioningmodule_ClientArea(array $params)
         );
 
         // In an error condition, display an error page.
-        return array(
+        return [
             'tabOverviewReplacementTemplate' => 'error.tpl',
-            'templateVariables' => array(
+            'templateVariables' => [
                 'usefulErrorHelper' => $e->getMessage(),
-            ),
-        );
+            ],
+        ];
     }
 }
