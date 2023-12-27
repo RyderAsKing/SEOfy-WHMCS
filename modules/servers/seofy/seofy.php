@@ -15,8 +15,8 @@
  *
  * Within the module itself, all functions must be prefixed with the module
  * filename, followed by an underscore, and then the function name. For this
- * example file, the filename is "provisioningmodule" and therefore all
- * functions begin "provisioningmodule_".
+ * example file, the filename is "seofy" and therefore all
+ * functions begin "seofy_".
  *
  * If your module or third party API does not support a given function, you
  * should not define that function within your module. Only the _ConfigOptions
@@ -49,16 +49,16 @@ if (!defined('WHMCS')) {
  *
  * @return array
  */
-function provisioningmodule_MetaData()
+function seofy_MetaData()
 {
     return [
-        'DisplayName' => 'Demo Provisioning Module',
-        'APIVersion' => '1.1', // Use API Version 1.1
-        'RequiresServer' => true, // Set true if module requires a server to work
+        'DisplayName' => 'SEOfy Provisioning Module',
+        'APIVersion' => '1', // Use API Version 1
+        'RequiresServer' => false, // Set true if module requires a server to work
         'DefaultNonSSLPort' => '1111', // Default Non-SSL Connection Port
         'DefaultSSLPort' => '1112', // Default SSL Connection Port
-        'ServiceSingleSignOnLabel' => 'Login to Panel as User',
-        'AdminSingleSignOnLabel' => 'Login to Panel as Admin',
+        'ServiceSingleSignOnLabel' => 'Login to SEOfy as User',
+        'AdminSingleSignOnLabel' => 'Login to SEOfy as Admin',
     ];
 }
 
@@ -85,7 +85,7 @@ function provisioningmodule_MetaData()
  *
  * @return array
  */
-function provisioningmodule_ConfigOptions()
+function seofy_ConfigOptions()
 {
     return [
         // a text field type allows for single line text input
@@ -149,7 +149,7 @@ function provisioningmodule_ConfigOptions()
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_CreateAccount(array $params)
+function seofy_CreateAccount(array $params)
 {
     try {
         // Call the service's provisioning function, using the values provided
@@ -171,7 +171,7 @@ function provisioningmodule_CreateAccount(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -197,7 +197,7 @@ function provisioningmodule_CreateAccount(array $params)
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_SuspendAccount(array $params)
+function seofy_SuspendAccount(array $params)
 {
     try {
         // Call the service's suspend function, using the values provided by
@@ -205,7 +205,7 @@ function provisioningmodule_SuspendAccount(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -231,7 +231,7 @@ function provisioningmodule_SuspendAccount(array $params)
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_UnsuspendAccount(array $params)
+function seofy_UnsuspendAccount(array $params)
 {
     try {
         // Call the service's unsuspend function, using the values provided by
@@ -239,7 +239,7 @@ function provisioningmodule_UnsuspendAccount(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -264,7 +264,7 @@ function provisioningmodule_UnsuspendAccount(array $params)
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_TerminateAccount(array $params)
+function seofy_TerminateAccount(array $params)
 {
     try {
         // Call the service's terminate function, using the values provided by
@@ -272,7 +272,7 @@ function provisioningmodule_TerminateAccount(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -301,7 +301,7 @@ function provisioningmodule_TerminateAccount(array $params)
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_ChangePassword(array $params)
+function seofy_ChangePassword(array $params)
 {
     try {
         // Call the service's change password function, using the values
@@ -318,7 +318,7 @@ function provisioningmodule_ChangePassword(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -347,7 +347,7 @@ function provisioningmodule_ChangePassword(array $params)
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_ChangePackage(array $params)
+function seofy_ChangePackage(array $params)
 {
     try {
         // Call the service's change password function, using the values
@@ -365,7 +365,7 @@ function provisioningmodule_ChangePackage(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -390,7 +390,7 @@ function provisioningmodule_ChangePackage(array $params)
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_Renew(array $params)
+function seofy_Renew(array $params)
 {
     try {
         // Call the service's provisioning function, using the values provided
@@ -412,7 +412,7 @@ function provisioningmodule_Renew(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -442,7 +442,7 @@ function provisioningmodule_Renew(array $params)
  *
  * @return array
  */
-function provisioningmodule_TestConnection(array $params)
+function seofy_TestConnection(array $params)
 {
     try {
         // Call the service's connection test function.
@@ -452,7 +452,7 @@ function provisioningmodule_TestConnection(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -475,11 +475,11 @@ function provisioningmodule_TestConnection(array $params)
  * Define additional actions that an admin user can perform for an
  * instance of a product/service.
  *
- * @see provisioningmodule_buttonOneFunction()
+ * @see seofy_buttonOneFunction()
  *
  * @return array
  */
-function provisioningmodule_AdminCustomButtonArray()
+function seofy_AdminCustomButtonArray()
 {
     return [
         'Button 1 Display Value' => 'buttonOneFunction',
@@ -498,7 +498,7 @@ function provisioningmodule_AdminCustomButtonArray()
  *
  * @return array
  */
-function provisioningmodule_ClientAreaCustomButtonArray()
+function seofy_ClientAreaCustomButtonArray()
 {
     return [
         'Action 1 Display Value' => 'actionOneFunction',
@@ -517,11 +517,11 @@ function provisioningmodule_ClientAreaCustomButtonArray()
  * @param array $params common module parameters
  *
  * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- * @see provisioningmodule_AdminCustomButtonArray()
+ * @see seofy_AdminCustomButtonArray()
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_buttonOneFunction(array $params)
+function seofy_buttonOneFunction(array $params)
 {
     try {
         // Call the service's function, using the values provided by WHMCS in
@@ -529,7 +529,7 @@ function provisioningmodule_buttonOneFunction(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -553,11 +553,11 @@ function provisioningmodule_buttonOneFunction(array $params)
  * @param array $params common module parameters
  *
  * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- * @see provisioningmodule_ClientAreaCustomButtonArray()
+ * @see seofy_ClientAreaCustomButtonArray()
  *
  * @return string "success" or an error message
  */
-function provisioningmodule_actionOneFunction(array $params)
+function seofy_actionOneFunction(array $params)
 {
     try {
         // Call the service's function, using the values provided by WHMCS in
@@ -565,7 +565,7 @@ function provisioningmodule_actionOneFunction(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -590,11 +590,11 @@ function provisioningmodule_actionOneFunction(array $params)
  * @param array $params common module parameters
  *
  * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- * @see provisioningmodule_AdminServicesTabFieldsSave()
+ * @see seofy_AdminServicesTabFieldsSave()
  *
  * @return array
  */
-function provisioningmodule_AdminServicesTabFields(array $params)
+function seofy_AdminServicesTabFields(array $params)
 {
     try {
         // Call the service's function, using the values provided by WHMCS in
@@ -610,11 +610,11 @@ function provisioningmodule_AdminServicesTabFields(array $params)
                 $response['lastLoginTimestamp']
             ),
             'Something Editable' =>
-                '<input type="hidden" name="provisioningmodule_original_uniquefieldname" ' .
+                '<input type="hidden" name="seofy_original_uniquefieldname" ' .
                 'value="' .
                 htmlspecialchars($response['textvalue']) .
                 '" />' .
-                '<input type="text" name="provisioningmodule_uniquefieldname"' .
+                '<input type="text" name="seofy_uniquefieldname"' .
                 'value="' .
                 htmlspecialchars($response['textvalue']) .
                 '" />',
@@ -622,7 +622,7 @@ function provisioningmodule_AdminServicesTabFields(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -647,19 +647,17 @@ function provisioningmodule_AdminServicesTabFields(array $params)
  * @param array $params common module parameters
  *
  * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- * @see provisioningmodule_AdminServicesTabFields()
+ * @see seofy_AdminServicesTabFields()
  */
-function provisioningmodule_AdminServicesTabFieldsSave(array $params)
+function seofy_AdminServicesTabFieldsSave(array $params)
 {
     // Fetch form submission variables.
-    $originalFieldValue = isset(
-        $_REQUEST['provisioningmodule_original_uniquefieldname']
-    )
-        ? $_REQUEST['provisioningmodule_original_uniquefieldname']
+    $originalFieldValue = isset($_REQUEST['seofy_original_uniquefieldname'])
+        ? $_REQUEST['seofy_original_uniquefieldname']
         : '';
 
-    $newFieldValue = isset($_REQUEST['provisioningmodule_uniquefieldname'])
-        ? $_REQUEST['provisioningmodule_uniquefieldname']
+    $newFieldValue = isset($_REQUEST['seofy_uniquefieldname'])
+        ? $_REQUEST['seofy_uniquefieldname']
         : '';
 
     // Look for a change in value to avoid making unnecessary service calls.
@@ -670,7 +668,7 @@ function provisioningmodule_AdminServicesTabFieldsSave(array $params)
         } catch (Exception $e) {
             // Record the error in WHMCS's module log.
             logModuleCall(
-                'provisioningmodule',
+                'seofy',
                 __FUNCTION__,
                 $params,
                 $e->getMessage(),
@@ -695,7 +693,7 @@ function provisioningmodule_AdminServicesTabFieldsSave(array $params)
  *
  * @return array
  */
-function provisioningmodule_ServiceSingleSignOn(array $params)
+function seofy_ServiceSingleSignOn(array $params)
 {
     try {
         // Call the service's single sign-on token retrieval function, using the
@@ -709,7 +707,7 @@ function provisioningmodule_ServiceSingleSignOn(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -740,7 +738,7 @@ function provisioningmodule_ServiceSingleSignOn(array $params)
  *
  * @return array
  */
-function provisioningmodule_AdminSingleSignOn(array $params)
+function seofy_AdminSingleSignOn(array $params)
 {
     try {
         // Call the service's single sign-on admin token retrieval function,
@@ -754,7 +752,7 @@ function provisioningmodule_AdminSingleSignOn(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
@@ -798,7 +796,7 @@ function provisioningmodule_AdminSingleSignOn(array $params)
  *
  * @return array
  */
-function provisioningmodule_ClientArea(array $params)
+function seofy_ClientArea(array $params)
 {
     // Determine the requested action and set service call parameters based on
     // the action.
@@ -832,7 +830,7 @@ function provisioningmodule_ClientArea(array $params)
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
-            'provisioningmodule',
+            'seofy',
             __FUNCTION__,
             $params,
             $e->getMessage(),
