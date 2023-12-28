@@ -1,60 +1,15 @@
 <?php
-/**
- * WHMCS SDK Sample Provisioning Module
- *
- * Provisioning Modules, also referred to as Product or Server Modules, allow
- * you to create modules that allow for the provisioning and management of
- * products and services in WHMCS.
- *
- * This sample file demonstrates how a provisioning module for WHMCS should be
- * structured and exercises all supported functionality.
- *
- * Provisioning Modules are stored in the /modules/servers/ directory. The
- * module name you choose must be unique, and should be all lowercase,
- * containing only letters & numbers, always starting with a letter.
- *
- * Within the module itself, all functions must be prefixed with the module
- * filename, followed by an underscore, and then the function name. For this
- * example file, the filename is "seofy" and therefore all
- * functions begin "seofy_".
- *
- * If your module or third party API does not support a given function, you
- * should not define that function within your module. Only the _ConfigOptions
- * function is required.
- *
- * For more information, please refer to the online documentation.
- *
- * @see https://developers.whmcs.com/provisioning-modules/
- *
- * @copyright Copyright (c) WHMCS Limited 2017
- * @license https://www.whmcs.com/license/ WHMCS Eula
- */
 
 if (!defined('WHMCS')) {
     die('This file cannot be accessed directly');
 }
 
-// Require any libraries needed for the module to function.
-// require_once __DIR__ . '/path/to/library/loader.php';
-//
-// Also, perform any initialization required by the service's library.
-
-/**
- * Define module related meta data.
- *
- * Values returned here are used to determine module related abilities and
- * settings.
- *
- * @see https://developers.whmcs.com/provisioning-modules/meta-data-params/
- *
- * @return array
- */
 function seofy_MetaData()
 {
     return [
         'DisplayName' => 'SEOfy Provisioning Module',
         'APIVersion' => '1', // Use API Version 1
-        'RequiresServer' => false, // Set true if module requires a server to work
+        'RequiresServer' => true, // Set true if module requires a server to work
         'DefaultNonSSLPort' => '1111', // Default Non-SSL Connection Port
         'DefaultSSLPort' => '1112', // Default SSL Connection Port
         'ServiceSingleSignOnLabel' => 'Login to SEOfy as User',
@@ -62,93 +17,19 @@ function seofy_MetaData()
     ];
 }
 
-/**
- * Define product configuration options.
- *
- * The values you return here define the configuration options that are
- * presented to a user when configuring a product for use with the module. These
- * values are then made available in all module function calls with the key name
- * configoptionX - with X being the index number of the field from 1 to 24.
- *
- * You can specify up to 24 parameters, with field types:
- * * text
- * * password
- * * yesno
- * * dropdown
- * * radio
- * * textarea
- *
- * Examples of each and their possible configuration parameters are provided in
- * this sample function.
- *
- * @see https://developers.whmcs.com/provisioning-modules/config-options/
- *
- * @return array
- */
 function seofy_ConfigOptions()
 {
     return [
-        // a text field type allows for single line text input
-        'Text Field' => [
+        'planID' => [
+            'FriendlyName' => 'Plan ID',
             'Type' => 'text',
             'Size' => '25',
-            'Default' => '1024',
-            'Description' => 'Enter in megabytes',
-        ],
-        // a password field type allows for masked text input
-        'Password Field' => [
-            'Type' => 'password',
-            'Size' => '25',
-            'Default' => '',
-            'Description' => 'Enter secret value here',
-        ],
-        // the yesno field type displays a single checkbox option
-        'Checkbox Field' => [
-            'Type' => 'yesno',
-            'Description' => 'Tick to enable',
-        ],
-        // the dropdown field type renders a select menu of options
-        'Dropdown Field' => [
-            'Type' => 'dropdown',
-            'Options' => [
-                'option1' => 'Display Value 1',
-                'option2' => 'Second Option',
-                'option3' => 'Another Option',
-            ],
-            'Description' => 'Choose one',
-        ],
-        // the radio field type displays a series of radio button options
-        'Radio Field' => [
-            'Type' => 'radio',
-            'Options' => 'First Option,Second Option,Third Option',
-            'Description' => 'Choose your option!',
-        ],
-        // the textarea field type allows for multi-line text input
-        'Textarea Field' => [
-            'Type' => 'textarea',
-            'Rows' => '3',
-            'Cols' => '60',
-            'Description' => 'Freeform multi-line text input field',
+            'Default' => '1',
+            'Description' => 'Enter plan ID here',
         ],
     ];
 }
 
-/**
- * Provision a new instance of a product/service.
- *
- * Attempt to provision a new instance of a given product/service. This is
- * called any time provisioning is requested inside of WHMCS. Depending upon the
- * configuration, this can be any of:
- * * When a new order is placed
- * * When an invoice for a new order is paid
- * * Upon manual request by an admin user
- *
- * @param array $params common module parameters
- *
- * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- *
- * @return string "success" or an error message
- */
 function seofy_CreateAccount(array $params)
 {
     try {
