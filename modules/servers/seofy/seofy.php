@@ -10,8 +10,8 @@ function seofy_MetaData()
         'DisplayName' => 'SEOfy Provisioning Module',
         'APIVersion' => '1', // Use API Version 1
         'RequiresServer' => true, // Set true if module requires a server to work
-        'DefaultNonSSLPort' => '1111', // Default Non-SSL Connection Port
-        'DefaultSSLPort' => '1112', // Default SSL Connection Port
+        'DefaultNonSSLPort' => '80', // Default Non-SSL Connection Port
+        'DefaultSSLPort' => '443', // Default SSL Connection Port
         'ServiceSingleSignOnLabel' => 'Login to SEOfy as User',
         'AdminSingleSignOnLabel' => 'Login to SEOfy as Admin',
     ];
@@ -20,12 +20,41 @@ function seofy_MetaData()
 function seofy_ConfigOptions()
 {
     return [
-        'planID' => [
+        // 'password' => [
+        //     'FriendlyName' => 'Password',
+        //     'Type' => 'password', # Password Field
+        //     'Size' => '25', # Defines the Field Width
+        //     'Description' => 'Password',
+        //     'Default' => 'Example',
+        // ],
+        // 'projectName' => [
+        //     'FriendlyName' => 'Project Name',
+        //     'Type' => 'text', # Text Box
+        //     'Size' => '25', # Defines the Field Width
+        //     'Description' => 'Textbox',
+        //     'Default' => 'Example',
+        // ],
+        // 'projectDescription' => [
+        //     'FriendlyName' => 'Project Description',
+        //     'Type' => 'textarea', # Text Box
+        //     'Rows' => '3', # Defines the Number of Rows
+        //     'Cols' => '60', # Defines the Number of Columns
+        //     'Description' => 'Textarea',
+        //     'Default' => 'Example',
+        // ],
+        // 'projectUrl' => [
+        //     'FriendlyName' => 'Project URL',
+        //     'Type' => 'text', # Text Box
+        //     'Size' => '25', # Defines the Field Width
+        //     'Description' => 'Textbox',
+        //     'Default' => 'Example',
+        // ],
+        'planId' => [
             'FriendlyName' => 'Plan ID',
             'Type' => 'text',
             'Size' => '25',
             'Default' => '1',
-            'Description' => 'Enter plan ID here',
+            'Description' => 'Enter plan ID from SEOfy here',
         ],
     ];
 }
