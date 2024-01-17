@@ -20,35 +20,6 @@ function seofy_MetaData()
 function seofy_ConfigOptions()
 {
     return [
-        // 'password' => [
-        //     'FriendlyName' => 'Password',
-        //     'Type' => 'password', # Password Field
-        //     'Size' => '25', # Defines the Field Width
-        //     'Description' => 'Password',
-        //     'Default' => 'Example',
-        // ],
-        // 'projectName' => [
-        //     'FriendlyName' => 'Project Name',
-        //     'Type' => 'text', # Text Box
-        //     'Size' => '25', # Defines the Field Width
-        //     'Description' => 'Textbox',
-        //     'Default' => 'Example',
-        // ],
-        // 'projectDescription' => [
-        //     'FriendlyName' => 'Project Description',
-        //     'Type' => 'textarea', # Text Box
-        //     'Rows' => '3', # Defines the Number of Rows
-        //     'Cols' => '60', # Defines the Number of Columns
-        //     'Description' => 'Textarea',
-        //     'Default' => 'Example',
-        // ],
-        // 'projectUrl' => [
-        //     'FriendlyName' => 'Project URL',
-        //     'Type' => 'text', # Text Box
-        //     'Size' => '25', # Defines the Field Width
-        //     'Description' => 'Textbox',
-        //     'Default' => 'Example',
-        // ],
         'planId' => [
             'FriendlyName' => 'Plan ID',
             'Type' => 'text',
@@ -78,6 +49,85 @@ function seofy_CreateAccount(array $params)
         //     ...
         // )
         // ```
+        // die(print '<pre>' . print_r($params, true) . '</pre>');
+
+        // user data
+        $ext_id = $params['clientsdetails']['userid'];
+
+        $username =
+            $params['clientsdetails']['firstname'] .
+            ' ' .
+            $params['clientsdetails']['lastname'];
+
+        $email = $params['clientsdetails']['email'];
+
+        // project data
+        $plan_id = $params['configoption1'];
+        $url = $params['domain'];
+        $name = $url . ' - ' . $username;
+        $description = $params['customfields']['description'];
+
+        $request = [
+            'ext_id' => $ext_id,
+            'name' => $username,
+            'email' => $email,
+            'password' => $params['password'],
+            'plan_id' => $plan_id,
+            'project_name' => $name,
+            'project_url' => 'https://' . $url,
+            'project_description' => $description . ' ' . $url,
+        ];
+
+        $server = [
+            'hostname' => $params['serverhostname'],
+            'api' => $params['serveraccesshash'],
+        ];
+
+        $protocol = $params['serversecure'] ? 'https' : 'http';
+        $apiEndpoint =
+            $protocol .
+            '://' .
+            $server['hostname'] .
+            '/api/whmcs/create-account';
+
+        // Convert data to JSON format
+        $jsonData = json_encode($request);
+
+        // Bearer token
+        $api = $server['api'];
+        // Set cURL options
+        $ch = curl_init($apiEndpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: ' . $api,
+        ]);
+
+        // Execute the cURL request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            echo 'Error: ' . curl_error($ch);
+        }
+
+        // Close cURL session
+        curl_close($ch);
+
+        // Process the response
+        $response = json_decode($response, true);
+
+        if ($response['success']) {
+            $params['model']->serviceProperties->save([
+                'seofy_id' => $response['project_id'],
+            ]);
+
+            return 'success';
+        } else {
+            return throw $response['message'];
+        }
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -513,21 +563,9 @@ function seofy_AdminServicesTabFields(array $params)
 
         // Return an array based on the function's response.
         return [
-            'Number of Apples' => (int) $response['numApples'],
-            'Number of Oranges' => (int) $response['numOranges'],
-            'Last Access Date' => date(
-                'Y-m-d H:i:s',
-                $response['lastLoginTimestamp']
-            ),
-            'Something Editable' =>
-                '<input type="hidden" name="seofy_original_uniquefieldname" ' .
-                'value="' .
-                htmlspecialchars($response['textvalue']) .
-                '" />' .
-                '<input type="text" name="seofy_uniquefieldname"' .
-                'value="' .
-                htmlspecialchars($response['textvalue']) .
-                '" />',
+            'SEOfy Project ID' => (int) $params[
+                'model'
+            ]->serviceProperties->get('seofy_id'),
         ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
