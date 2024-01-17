@@ -33,50 +33,13 @@ function seofy_ConfigOptions()
 function seofy_CreateAccount(array $params)
 {
     try {
-        // Call the service's provisioning function, using the values provided
-        // by WHMCS in `$params`.
-        //
-        // A sample `$params` array may be defined as:
-        //
-        // ```
-        // array(
-        //     'domain' => 'The domain of the service to provision',
-        //     'username' => 'The username to access the new service',
-        //     'password' => 'The password to access the new service',
-        //     'configoption1' => 'The amount of disk space to provision',
-        //     'configoption2' => 'The new services secret key',
-        //     'configoption3' => 'Whether or not to enable FTP',
-        //     ...
-        // )
-        // ```
         // die(print '<pre>' . print_r($params, true) . '</pre>');
 
+        // checking if SEOfy ID exists
+        if ($params['model']->serviceProperties->get('seofy_id')) {
+            return 'Project already exists in SEOfy';
+        }
         // user data
-        $ext_id = $params['clientsdetails']['userid'];
-
-        $username =
-            $params['clientsdetails']['firstname'] .
-            ' ' .
-            $params['clientsdetails']['lastname'];
-
-        $email = $params['clientsdetails']['email'];
-
-        // project data
-        $plan_id = $params['configoption1'];
-        $url = $params['domain'];
-        $name = $url . ' - ' . $username;
-        $description = $params['customfields']['description'];
-
-        $request = [
-            'ext_id' => $ext_id,
-            'name' => $username,
-            'email' => $email,
-            'password' => $params['password'],
-            'plan_id' => $plan_id,
-            'project_name' => $name,
-            'project_url' => 'https://' . $url,
-            'project_description' => $description . ' ' . $url,
-        ];
 
         $server = [
             'hostname' => $params['serverhostname'],
@@ -84,11 +47,34 @@ function seofy_CreateAccount(array $params)
         ];
 
         $protocol = $params['serversecure'] ? 'https' : 'http';
+
         $apiEndpoint =
             $protocol .
             '://' .
             $server['hostname'] .
             '/api/whmcs/create-account';
+
+        $request = [
+            'ext_id' => $params['clientsdetails']['userid'],
+            'name' =>
+                $params['clientsdetails']['firstname'] .
+                ' ' .
+                $params['clientsdetails']['lastname'],
+            'email' => $params['clientsdetails']['email'],
+            'password' => $params['password'],
+            'plan_id' => $params['configoption1'],
+            'project_name' =>
+                $params['domain'] .
+                ' - ' .
+                $params['clientsdetails']['firstname'] .
+                ' ' .
+                $params['clientsdetails']['lastname'],
+            'project_url' => 'https://' . $params['domain'],
+            'project_description' =>
+                $params['customfields']['description'] .
+                ' ' .
+                $params['domain'],
+        ];
 
         // Convert data to JSON format
         $jsonData = json_encode($request);
@@ -126,7 +112,7 @@ function seofy_CreateAccount(array $params)
 
             return 'success';
         } else {
-            return throw $response['message'];
+            return $response['message'];
         }
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
@@ -162,6 +148,64 @@ function seofy_SuspendAccount(array $params)
     try {
         // Call the service's suspend function, using the values provided by
         // WHMCS in `$params`.
+
+        $server = [
+            'hostname' => $params['serverhostname'],
+            'api' => $params['serveraccesshash'],
+        ];
+
+        $protocol = $params['serversecure'] ? 'https' : 'http';
+
+        $apiEndpoint =
+            $protocol .
+            '://' .
+            $server['hostname'] .
+            '/api/whmcs/suspend-account';
+
+        $request = [
+            'ext_id' => $params['clientsdetails']['userid'],
+            'project_id' => $params['model']->serviceProperties->get(
+                'seofy_id'
+            ),
+        ];
+
+        // Convert data to JSON format
+
+        $jsonData = json_encode($request);
+
+        // Bearer token
+        $api = $server['api'];
+
+        // Set cURL options
+        $ch = curl_init($apiEndpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: ' . $api,
+        ]);
+
+        // Execute the cURL request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            echo 'Error: ' . curl_error($ch);
+        }
+
+        // Close cURL session
+        curl_close($ch);
+
+        // Process the response
+
+        $response = json_decode($response, true);
+
+        if ($response['success']) {
+            return 'success';
+        } else {
+            return $response['message'];
+        }
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
@@ -196,6 +240,63 @@ function seofy_UnsuspendAccount(array $params)
     try {
         // Call the service's unsuspend function, using the values provided by
         // WHMCS in `$params`.
+
+        $server = [
+            'hostname' => $params['serverhostname'],
+            'api' => $params['serveraccesshash'],
+        ];
+
+        $protocol = $params['serversecure'] ? 'https' : 'http';
+
+        $apiEndpoint =
+            $protocol .
+            '://' .
+            $server['hostname'] .
+            '/api/whmcs/unsuspend-account';
+
+        $request = [
+            'ext_id' => $params['clientsdetails']['userid'],
+            'project_id' => $params['model']->serviceProperties->get(
+                'seofy_id'
+            ),
+        ];
+
+        // Convert data to JSON format
+        $jsonData = json_encode($request);
+
+        // Bearer token
+        $api = $server['api'];
+
+        // Set cURL options
+        $ch = curl_init($apiEndpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: ' . $api,
+        ]);
+
+        // Execute the cURL request
+
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            echo 'Error: ' . curl_error($ch);
+        }
+
+        // Close cURL session
+        curl_close($ch);
+
+        // Process the response
+        $response = json_decode($response, true);
+
+        if ($response['success']) {
+            return 'success';
+        } else {
+            return $response['message'];
+        }
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
