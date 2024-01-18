@@ -415,82 +415,35 @@ function seofy_TerminateAccount(array $params)
  *
  * @return string "success" or an error message
  */
-function seofy_ChangePassword(array $params)
-{
-    try {
-        // Call the service's change password function, using the values
-        // provided by WHMCS in `$params`.
-        //
-        // A sample `$params` array may be defined as:
-        //
-        // ```
-        // array(
-        //     'username' => 'The service username',
-        //     'password' => 'The new service password',
-        // )
-        // ```
-    } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
-        logModuleCall(
-            'seofy',
-            __FUNCTION__,
-            $params,
-            $e->getMessage(),
-            $e->getTraceAsString()
-        );
+// function seofy_ChangePassword(array $params)
+// {
+//     try {
+//         // Call the service's change password function, using the values
+//         // provided by WHMCS in `$params`.
+//         //
+//         // A sample `$params` array may be defined as:
+//         //
+//         // ```
+//         // array(
+//         //     'username' => 'The service username',
+//         //     'password' => 'The new service password',
+//         // )
+//         // ```
+//     } catch (Exception $e) {
+//         // Record the error in WHMCS's module log.
+//         logModuleCall(
+//             'seofy',
+//             __FUNCTION__,
+//             $params,
+//             $e->getMessage(),
+//             $e->getTraceAsString()
+//         );
 
-        return $e->getMessage();
-    }
+//         return $e->getMessage();
+//     }
 
-    return 'success';
-}
-
-/**
- * Upgrade or downgrade an instance of a product/service.
- *
- * Called to apply any change in product assignment or parameters. It
- * is called to provision upgrade or downgrade orders, as well as being
- * able to be invoked manually by an admin user.
- *
- * This same function is called for upgrades and downgrades of both
- * products and configurable options.
- *
- * @param array $params common module parameters
- *
- * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- *
- * @return string "success" or an error message
- */
-function seofy_ChangePackage(array $params)
-{
-    try {
-        // Call the service's change password function, using the values
-        // provided by WHMCS in `$params`.
-        //
-        // A sample `$params` array may be defined as:
-        //
-        // ```
-        // array(
-        //     'username' => 'The service username',
-        //     'configoption1' => 'The new service disk space',
-        //     'configoption3' => 'Whether or not to enable FTP',
-        // )
-        // ```
-    } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
-        logModuleCall(
-            'seofy',
-            __FUNCTION__,
-            $params,
-            $e->getMessage(),
-            $e->getTraceAsString()
-        );
-
-        return $e->getMessage();
-    }
-
-    return 'success';
-}
+//     return 'success';
+// }
 
 /**
  * Renew an instance of a product/service.
@@ -507,22 +460,65 @@ function seofy_ChangePackage(array $params)
 function seofy_Renew(array $params)
 {
     try {
-        // Call the service's provisioning function, using the values provided
-        // by WHMCS in `$params`.
-        //
-        // A sample `$params` array may be defined as:
-        //
-        // ```
-        // array(
-        //     'domain' => 'The domain of the service to provision',
-        //     'username' => 'The username to access the new service',
-        //     'password' => 'The password to access the new service',
-        //     'configoption1' => 'The amount of disk space to provision',
-        //     'configoption2' => 'The new services secret key',
-        //     'configoption3' => 'Whether or not to enable FTP',
-        //     ...
-        // )
-        // ```
+        if (!$params['model']->serviceProperties->get('seofy_id')) {
+            return 'Project does not exist in SEOfy';
+        }
+
+        $server = [
+            'hostname' => $params['serverhostname'],
+            'api' => $params['serveraccesshash'],
+        ];
+
+        $protocol = $params['serversecure'] ? 'https' : 'http';
+
+        $apiEndpoint =
+            $protocol . '://' . $server['hostname'] . '/api/whmcs/renew';
+
+        $request = [
+            'ext_id' => $params['clientsdetails']['userid'],
+            'project_id' => $params['model']->serviceProperties->get(
+                'seofy_id'
+            ),
+        ];
+
+        // Convert data to JSON format
+
+        $jsonData = json_encode($request);
+
+        // Bearer token
+        $api = $server['api'];
+
+        // Set cURL options
+        $ch = curl_init($apiEndpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: ' . $api,
+        ]);
+
+        // Execute the cURL request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            return 'Error: ' . curl_error($ch);
+        }
+
+        // Close cURL session
+        curl_close($ch);
+
+        // Process the response
+        $response = json_decode($response, true);
+
+        // die(print '<pre>' . print_r($response) . (print '</pre>'));
+
+        if ($response['success']) {
+            return 'success';
+        } else {
+            return $response['message'];
+        }
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
         logModuleCall(
