@@ -104,7 +104,6 @@ function seofy_CreateAccount(array $params)
 
         // Process the response
         $response = json_decode($response, true);
-
         if ($response['success']) {
             $params['model']->serviceProperties->save([
                 'seofy_id' => $response['project_id'],
@@ -115,7 +114,6 @@ function seofy_CreateAccount(array $params)
             return $response['message'];
         }
     } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
         logModuleCall(
             'seofy',
             __FUNCTION__,
@@ -146,8 +144,9 @@ function seofy_CreateAccount(array $params)
 function seofy_SuspendAccount(array $params)
 {
     try {
-        // Call the service's suspend function, using the values provided by
-        // WHMCS in `$params`.
+        if (!$params['model']->serviceProperties->get('seofy_id')) {
+            return 'Project does not exist in SEOfy';
+        }
 
         $server = [
             'hostname' => $params['serverhostname'],
@@ -170,7 +169,6 @@ function seofy_SuspendAccount(array $params)
         ];
 
         // Convert data to JSON format
-
         $jsonData = json_encode($request);
 
         // Bearer token
@@ -198,16 +196,13 @@ function seofy_SuspendAccount(array $params)
         curl_close($ch);
 
         // Process the response
-
         $response = json_decode($response, true);
-
         if ($response['success']) {
             return 'success';
         } else {
             return $response['message'];
         }
     } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
         logModuleCall(
             'seofy',
             __FUNCTION__,
@@ -238,8 +233,9 @@ function seofy_SuspendAccount(array $params)
 function seofy_UnsuspendAccount(array $params)
 {
     try {
-        // Call the service's unsuspend function, using the values provided by
-        // WHMCS in `$params`.
+        if (!$params['model']->serviceProperties->get('seofy_id')) {
+            return 'Project does not exist in SEOfy';
+        }
 
         $server = [
             'hostname' => $params['serverhostname'],
@@ -278,7 +274,6 @@ function seofy_UnsuspendAccount(array $params)
         ]);
 
         // Execute the cURL request
-
         $response = curl_exec($ch);
 
         // Check for errors
@@ -291,14 +286,12 @@ function seofy_UnsuspendAccount(array $params)
 
         // Process the response
         $response = json_decode($response, true);
-
         if ($response['success']) {
             return 'success';
         } else {
             return $response['message'];
         }
     } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
         logModuleCall(
             'seofy',
             __FUNCTION__,
@@ -328,10 +321,70 @@ function seofy_UnsuspendAccount(array $params)
 function seofy_TerminateAccount(array $params)
 {
     try {
-        // Call the service's terminate function, using the values provided by
-        // WHMCS in `$params`.
+        if (!$params['model']->serviceProperties->get('seofy_id')) {
+            return 'Project does not exist in SEOfy';
+        }
+
+        $server = [
+            'hostname' => $params['serverhostname'],
+            'api' => $params['serveraccesshash'],
+        ];
+
+        $protocol = $params['serversecure'] ? 'https' : 'http';
+
+        $apiEndpoint =
+            $protocol .
+            '://' .
+            $server['hostname'] .
+            '/api/whmcs/terminate-account';
+
+        $request = [
+            'ext_id' => $params['clientsdetails']['userid'],
+            'project_id' => $params['model']->serviceProperties->get(
+                'seofy_id'
+            ),
+        ];
+
+        // Convert data to JSON format
+
+        $jsonData = json_encode($request);
+
+        // Bearer token
+        $api = $server['api'];
+
+        // Set cURL options
+        $ch = curl_init($apiEndpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: ' . $api,
+        ]);
+
+        // Execute the cURL request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            return 'Error: ' . curl_error($ch);
+        }
+
+        // Close cURL session
+        curl_close($ch);
+
+        // Process the response
+        $response = json_decode($response, true);
+
+        // die(print '<pre>' . print_r($response) . (print '</pre>'));
+
+        if ($response['success']) {
+            $params['model']->serviceProperties->save(['seofy_id' => null]);
+            return 'success';
+        } else {
+            return $response['message'];
+        }
     } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
         logModuleCall(
             'seofy',
             __FUNCTION__,
@@ -531,24 +584,6 @@ function seofy_TestConnection(array $params)
 }
 
 /**
- * Additional actions an admin user can invoke.
- *
- * Define additional actions that an admin user can perform for an
- * instance of a product/service.
- *
- * @see seofy_buttonOneFunction()
- *
- * @return array
- */
-function seofy_AdminCustomButtonArray()
-{
-    return [
-        'Button 1 Display Value' => 'buttonOneFunction',
-        'Button 2 Display Value' => 'buttonTwoFunction',
-    ];
-}
-
-/**
  * Additional actions a client user can invoke.
  *
  * Define additional actions a client user can perform for an instance of a
@@ -562,45 +597,8 @@ function seofy_AdminCustomButtonArray()
 function seofy_ClientAreaCustomButtonArray()
 {
     return [
-        'Action 1 Display Value' => 'actionOneFunction',
-        'Action 2 Display Value' => 'actionTwoFunction',
+        'View in SEOfy' => 'actionOneFunction',
     ];
-}
-
-/**
- * Custom function for performing an additional action.
- *
- * You can define an unlimited number of custom functions in this way.
- *
- * Similar to all other module call functions, they should either return
- * 'success' or an error message to be displayed.
- *
- * @param array $params common module parameters
- *
- * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- * @see seofy_AdminCustomButtonArray()
- *
- * @return string "success" or an error message
- */
-function seofy_buttonOneFunction(array $params)
-{
-    try {
-        // Call the service's function, using the values provided by WHMCS in
-        // `$params`.
-    } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
-        logModuleCall(
-            'seofy',
-            __FUNCTION__,
-            $params,
-            $e->getMessage(),
-            $e->getTraceAsString()
-        );
-
-        return $e->getMessage();
-    }
-
-    return 'success';
 }
 
 /**
