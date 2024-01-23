@@ -593,7 +593,7 @@ function seofy_TestConnection(array $params)
 function seofy_ClientAreaCustomButtonArray()
 {
     return [
-        'View in SEOfy' => 'actionOneFunction',
+        'View in SEOfy' => 'ServiceSingleSignOn',
     ];
 }
 
@@ -741,11 +741,61 @@ function seofy_ServiceSingleSignOn(array $params)
     try {
         // Call the service's single sign-on token retrieval function, using the
         // values provided by WHMCS in `$params`.
-        $response = [];
 
+        $server = [
+            'hostname' => $params['serverhostname'],
+            'api' => $params['serveraccesshash'],
+        ];
+
+        $protocol = $params['serversecure'] ? 'https' : 'http';
+
+        $apiEndpoint =
+            $protocol . '://' . $server['hostname'] . '/api/whmcs/sso';
+
+        $request = [
+            'ext_id' => $params['clientsdetails']['userid'],
+            'project_id' => $params['model']->serviceProperties->get(
+                'seofy_id'
+            ),
+        ];
+
+        // Convert data to JSON format
+        $jsonData = json_encode($request);
+
+        // Bearer token
+        $api = $server['api'];
+        // Set cURL options
+        $ch = curl_init($apiEndpoint);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'X-API-KEY: ' . $api,
+        ]);
+
+        // Execute the cURL request
+        $response = curl_exec($ch);
+
+        // Check for errors
+        if (curl_errno($ch)) {
+            echo 'Error: ' . curl_error($ch);
+        }
+
+        // Close cURL session
+        curl_close($ch);
+
+        // Process the response
+        $response = json_decode($response, true);
+
+        // dump the response (die)
+        // die(print '<pre>' . print_r($response) . (print '</pre>'));
+        if ($response['error']) {
+            return $response['error'];
+        }
         return [
             'success' => true,
-            'redirectTo' => $response['redirectUrl'],
+            'redirectTo' => $response['redirectTo'],
         ];
     } catch (Exception $e) {
         // Record the error in WHMCS's module log.
