@@ -13,7 +13,6 @@ function seofy_MetaData()
         'DefaultNonSSLPort' => '80', // Default Non-SSL Connection Port
         'DefaultSSLPort' => '443', // Default SSL Connection Port
         'ServiceSingleSignOnLabel' => 'Login to SEOfy as User',
-        'AdminSingleSignOnLabel' => 'Login to SEOfy as Admin',
     ];
 }
 
@@ -815,51 +814,6 @@ function seofy_ServiceSingleSignOn(array $params)
 }
 
 /**
- * Perform single sign-on for a server.
- *
- * Called when single sign-on is requested for a server assigned to the module.
- *
- * This differs from ServiceSingleSignOn in that it relates to a server
- * instance within the admin area, as opposed to a single client instance of a
- * product/service.
- *
- * When successful, returns a URL to which the user should be redirected to.
- *
- * @param array $params common module parameters
- *
- * @see https://developers.whmcs.com/provisioning-modules/module-parameters/
- *
- * @return array
- */
-function seofy_AdminSingleSignOn(array $params)
-{
-    try {
-        // Call the service's single sign-on admin token retrieval function,
-        // using the values provided by WHMCS in `$params`.
-        $response = [];
-
-        return [
-            'success' => true,
-            'redirectTo' => $response['redirectUrl'],
-        ];
-    } catch (Exception $e) {
-        // Record the error in WHMCS's module log.
-        logModuleCall(
-            'seofy',
-            __FUNCTION__,
-            $params,
-            $e->getMessage(),
-            $e->getTraceAsString()
-        );
-
-        return [
-            'success' => false,
-            'errorMsg' => $e->getMessage(),
-        ];
-    }
-}
-
-/**
  * Client area output logic handling.
  *
  * This function is used to define module specific client area output. It should
@@ -910,14 +864,15 @@ function seofy_ClientArea(array $params)
         // values provided by WHMCS in `$params`.
         $response = [];
 
-        $extraVariable1 = 'abc';
-        $extraVariable2 = '123';
+        $view =
+            'clientarea.php?action=productdetails&id=' .
+            $params['serviceid'] .
+            '&dosinglesignon=1';
 
         return [
             'tabOverviewReplacementTemplate' => $templateFile,
             'templateVariables' => [
-                'extraVariable1' => $extraVariable1,
-                'extraVariable2' => $extraVariable2,
+                'view' => $view,
             ],
         ];
     } catch (Exception $e) {
